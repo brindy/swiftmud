@@ -1,7 +1,7 @@
 
 protocol CommandHandler {
     
-    func handle(connection: Connection) -> CommandHandler?
+    func handle(io: TerminalIO, world: World) -> CommandHandler?
     
 }
 

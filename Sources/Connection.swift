@@ -1,9 +1,19 @@
 import Sockets
 import Transport
 
-class Connection {
+protocol TerminalIO {
+    
+    func readLine() -> String?
+    
+    func write(string: String) -> Bool
+    
+}
 
-    lazy var commandHandler: CommandHandler! = LoginHandler()
+class Connection: TerminalIO {
+
+    let world = World()
+    
+    var commandHandler: CommandHandler! = LoginHandler()
 
     let client: TCPInternetSocket
     
@@ -20,7 +30,7 @@ class Connection {
                 return
             }
             
-            commandHandler = commandHandler.handle(connection: self)
+            commandHandler = commandHandler.handle(io: self, world: world)
         }
         
     }
@@ -37,7 +47,7 @@ class Connection {
             return nil
         }
 
-        return message.trimmingCharacters(in: .whitespaces)
+        return message.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     func write(string: String) -> Bool {
