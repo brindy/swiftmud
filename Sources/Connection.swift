@@ -20,12 +20,7 @@ class Connection {
                 return
             }
             
-            guard let message = readLine() else {
-                print("failed to read line")
-                return
-            }
-            
-            commandHandler = commandHandler.handle(message: message, forConnection: self)
+            commandHandler = commandHandler.handle(connection: self)
         }
         
     }
@@ -42,7 +37,7 @@ class Connection {
             return nil
         }
 
-        return message
+        return message.trimmingCharacters(in: .whitespaces)
     }
     
     func write(string: String) -> Bool {
