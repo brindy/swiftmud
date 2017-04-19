@@ -10,13 +10,13 @@ class DungeonHandler: CommandHandler {
     func handle(io: TerminalIO, world: World) -> CommandHandler? {
         log(tag: self, message: "handle IN")
         
-        guard io.write(string: "Welcome to swiftmud. ") else {
+        guard io.print("Welcome to swiftmud. ") else {
             log(tag: self, message: "failed to write welcome message")
             return nil
         }
         
         while(true) {
-            guard io.write(string: "> ") else {
+            guard io.print("> ") else {
                 log(tag: self, message: "failed to write prompt")
                 return nil
             }
@@ -30,7 +30,7 @@ class DungeonHandler: CommandHandler {
                 break
             }
 
-            guard io.write(string: "Sorry, I don't know how to '\(line)'\n") else {
+            guard io.print("Sorry, I don't know how to '\(line)'\n") else {
                 log(tag: self, message: "failed to echo line")
                 return nil
             }

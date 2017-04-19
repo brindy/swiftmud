@@ -9,7 +9,7 @@ class LoginHandler: CommandHandler {
             return nil
         }
 
-        guard io.write(string: "Hello, \(name).  ") else {
+        guard io.print("Hello, \(name).  ") else {
             log(tag: self, message: "failed to send hello")
             return nil
         }
@@ -25,7 +25,7 @@ class LoginHandler: CommandHandler {
             return DungeonHandler(user: user)
         }
         
-        guard io.write(string: "What is your password? ") else {
+        guard io.print("What is your password? ") else {
             log(tag: self, message: "failed to write password prompt")
             return nil
         }
@@ -36,7 +36,7 @@ class LoginHandler: CommandHandler {
         }
         
         guard password == user.password else {
-            guard io.write(string: "Incorrect password.  Goodbye.") else {
+            guard io.print("Incorrect password.  Goodbye.") else {
                 log(tag: self, message: "failed to write incorrect password message")
                 return nil
             }
@@ -66,7 +66,7 @@ class LoginHandler: CommandHandler {
         
         while(true) {
             
-            guard io.write(string: "Please choose a password: ") else {
+            guard io.print("Please choose a password: ") else {
                 log(tag: self, message: "failed to write password prompt")
                 return nil
             }
@@ -77,14 +77,14 @@ class LoginHandler: CommandHandler {
             }
 
             guard password.utf8.count >= 6 else {
-                guard io.write(string: "Password must be 6 or more characters.\n") else {
+                guard io.print("Password must be 6 or more characters.\n") else {
                     log(tag: self, message: "failed to write password length error")
                     return nil
                 }
                 continue
             }
             
-            guard io.write(string: "Confirm password: ") else {
+            guard io.print("Confirm password: ") else {
                 log(tag: self, message: "failed to write confirm password prompt")
                 return nil
             }
@@ -98,7 +98,7 @@ class LoginHandler: CommandHandler {
                 return password
             }
 
-            guard io.write(string: "Passwords do not match.\n") else {
+            guard io.print("Passwords do not match.\n") else {
                 log(tag: self, message: "failed to write confirm error")
                 return nil
             }
@@ -110,7 +110,7 @@ class LoginHandler: CommandHandler {
         
         while (true) {
         
-            guard io.write(string: "Hello, please enter your name: ") else {
+            guard io.print("Hello, please enter your name: ") else {
                 log(tag: self, message: "failed to write prompt")
                 return nil
             }
@@ -124,7 +124,7 @@ class LoginHandler: CommandHandler {
                 return name
             }
 
-            guard io.write(string: "Sorry, names must be lower-case characters only.\n") else {
+            guard io.print("Sorry, names must be lower-case characters only.\n") else {
                 log(tag: self, message: "failed to write user name error")
                 return nil
             }

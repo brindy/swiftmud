@@ -5,7 +5,7 @@ protocol TerminalIO {
 
     func readLine() -> String?
     
-    func write(string: String) -> Bool
+    func print(_ string: String) -> Bool
     
 }
 
@@ -50,7 +50,7 @@ class Connection: TerminalIO {
         return message.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
-    func write(string: String) -> Bool {
+    func print(_ string: String) -> Bool {
         
         do {
             try client.write(string)
