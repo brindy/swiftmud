@@ -2,7 +2,7 @@ import Sockets
 import Transport
 
 protocol TerminalIO {
-    
+
     func readLine() -> String?
     
     func write(string: String) -> Bool
@@ -22,11 +22,11 @@ class Connection: TerminalIO {
     }
     
     func start() {
-        print("client start: \(String(describing: client.address))")
+        log(tag: self, message: "client start: \(String(describing: client.address))")
         
         while(true) {
             guard commandHandler != nil else {
-                print("no command handler")
+                log(tag: self, message: "no command handler")
                 return
             }
             
@@ -38,12 +38,12 @@ class Connection: TerminalIO {
     func readLine() -> String? {
         
         guard let message = try? client.read(max: 2048).makeString() else {
-            print("client closed, error reading stream: \(String(describing: client.address))")
+            log(tag: self, message: "client closed, error reading stream: \(String(describing: client.address))")
             return nil
         }
         
         guard message != "" else {
-            print("client closed, no data in steam: \(String(describing: client.address))")
+            log(tag: self, message: "client closed, no data in steam: \(String(describing: client.address))")
             return nil
         }
 
@@ -61,7 +61,7 @@ class Connection: TerminalIO {
         return true
         
     }
-    
+
 }
 
 
