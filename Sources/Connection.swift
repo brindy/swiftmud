@@ -11,14 +11,14 @@ protocol TerminalIO {
 
 class Connection: TerminalIO {
 
-    let world = World()
-    
     var commandHandler: CommandHandler! = LoginHandler()
 
     let client: TCPInternetSocket
+    let world: World
     
-    init(client: TCPInternetSocket) {
+    init(client: TCPInternetSocket, world: World) {
         self.client = client
+        self.world = world
     }
     
     func start() {

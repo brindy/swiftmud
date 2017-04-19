@@ -1,6 +1,4 @@
 
-// TODO connection should have 'current user'
-// TODO need to pass around the 'world' context
 class LoginHandler: CommandHandler {
     
     func handle(io: TerminalIO, world: World) -> CommandHandler? {
@@ -11,29 +9,57 @@ class LoginHandler: CommandHandler {
             return nil
         }
 
-        guard io.write(string: "Hello, \(name)") else {
+        guard io.write(string: "Hello, \(name).  ") else {
             print("LoginHandler", "failed to send hello")
             return nil
         }
 
-        if let user = world.findUser(with: name) {
-            
-            // TODO if not new, enter password
+        guard let user = world.findUser(with: name) else {
 
-        } else {
-            
-            guard let password = readPassword(from: io) else {
-                print("LoginHandler", "failed to read password")
+            guard let user = registerUser(using: io, with: name, in: world) else {
+                print("LoginHandler", "failed to register user")
                 return nil
             }
-
+            
+            print("LoginHandler", "new user \(user.name) OUT")
+            return NavigationHandler(user: user)
         }
         
-        print("LoginHandler", "handle OUT")
-        return self
+        // TODO prompt for password
+        
+        guard let password = io.readLine() else {
+            print("LoginHandler", "failed to read existing password")
+            return nil
+        }
+        
+        guard password == user.password else {
+            guard io.write(string: "Incorrect password.  Goodbye.") else {
+                print("LoginHandler", "failed to write incorrect password message")
+                return nil
+            }
+            
+            return nil
+        }
+        
+        print("LoginHandler", "registered user \(user.name) OUT")
+        return NavigationHandler(user: user)
     }
     
-    func readPassword(from io:TerminalIO) -> String? {
+    func registerUser(using io: TerminalIO, with name: String, in world: World) -> User? {
+        
+        guard let password = readNewPassword(from: io) else {
+            print("LoginHandler", "failed to read password")
+            return nil
+        }
+        
+        let user = User(name: name, password: password)
+        
+        world.update(user: user)
+        
+        return user
+    }
+    
+    func readNewPassword(from io:TerminalIO) -> String? {
         
         while(true) {
             

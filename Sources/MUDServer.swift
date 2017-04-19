@@ -5,6 +5,8 @@ import Transport
 
 class MUDServer {
 
+    let world = World()
+    
     var connections: Set<Connection> = []
     
 	let port:Int
@@ -32,7 +34,7 @@ class MUDServer {
             
             background {
                 print("new background thread for \(String(describing: client.address))")
-                let connection = Connection(client: client)
+                let connection = Connection(client: client, world: self.world)
                 self.connections.insert(connection)
                 connection.start()
                 self.connections.remove(connection)
