@@ -4,14 +4,14 @@ project(SwiftMud)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
+        Sources/ConnectionProperties.swift
         Sources/CommandHandler.swift
         Sources/Connection.swift
         Sources/LoginHandler.swift
         Sources/main.swift
         Sources/Server.swift
         Sources/DungeonHandler.swift
-        Sources/World.swift
-        Package.swift)
+        Sources/World.swift)
 
 add_custom_target(SwiftMud
         COMMAND swift build

@@ -14,38 +14,43 @@ class LoginHandler: CommandHandler {
             return nil
         }
 
-        guard let user = world.findUser(with: name) else {
+        var user:User! = world.findUser(with: name)
+        if user == nil {
 
-            guard let user = registerUser(using: io, with: name, in: world) else {
+            guard let u = registerUser(using: io, with: name, in: world) else {
                 log(tag: self, message: "failed to register user")
                 return nil
             }
 
+            user = u
             log(tag: self, message: "new user \(user.name) OUT")
-            return DungeonHandler(user: user)
-        }
-        
-        guard io.print("What is your password? ") else {
-            log(tag: self, message: "failed to write password prompt")
-            return nil
-        }
-        
-        guard let password = io.readLine() else {
-            log(tag: self, message: "failed to read existing password")
-            return nil
-        }
-        
-        guard password == user.password else {
-            guard io.print("Incorrect password.  Goodbye.") else {
-                log(tag: self, message: "failed to write incorrect password message")
+
+        } else { // authenticate user
+
+            guard io.print("What is your password? ") else {
+                log(tag: self, message: "failed to write password prompt")
                 return nil
             }
-            
-            return nil
+
+            guard let password = io.readLine() else {
+                log(tag: self, message: "failed to read existing password")
+                return nil
+            }
+
+            guard password == user.password else {
+                guard io.print("Incorrect password.  Goodbye.") else {
+                    log(tag: self, message: "failed to write incorrect password message")
+                    return nil
+                }
+
+                return nil
+            }
+
         }
 
         log(tag: self, message: "registered user \(user.name) OUT")
-        return DungeonHandler(user: user)
+        ConnectionProperties.instance().user = user
+        return DungeonHandler()
     }
     
     func registerUser(using io: TerminalIO, with name: String, in world: World) -> User? {

@@ -35,11 +35,17 @@ class Server {
             
             background {
                 log(tag: self, message: "new background thread for \(String(describing: client.address))")
+
                 let connection = Connection(client: client, world: self.world)
-                Thread.current.threadDictionary["connection"] = connection
+
+                ConnectionProperties.instance().connection = connection
+
                 self.connections.insert(connection)
                 connection.start()
                 self.connections.remove(connection)
+
+                ConnectionProperties.kill()
+
                 log(tag: self, message: "background thread finished for \(String(describing: client.address))")
                 try? client.close()
             }

@@ -3,6 +3,8 @@ import Transport
 
 protocol TerminalIO {
 
+    var user:User? { get set }
+
     func readLine() -> String?
     
     func print(_ string: String) -> Bool
@@ -15,7 +17,8 @@ class Connection: TerminalIO {
 
     let client: TCPInternetSocket
     let world: World
-    
+    var user: User?
+
     init(client: TCPInternetSocket, world: World) {
         self.client = client
         self.world = world
