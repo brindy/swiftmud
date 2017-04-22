@@ -49,7 +49,7 @@ class LoginHandler: CommandHandler {
         }
 
         log(tag: self, message: "registered user \(user.name) OUT")
-        ConnectionProperties.instance().user = user
+        Context.get().user = user
         return DungeonHandler()
     }
     

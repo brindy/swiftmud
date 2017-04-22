@@ -4,7 +4,7 @@ project(SwiftMud)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-        Sources/ConnectionProperties.swift
+        Sources/Context.swift
         Sources/CommandHandler.swift
         Sources/Connection.swift
         Sources/LoginHandler.swift

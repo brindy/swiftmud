@@ -1,17 +1,17 @@
 import Foundation
 
-class ConnectionProperties {
+class Context {
 
-    static func instance() -> ConnectionProperties {
-        var properties = Thread.current.threadDictionary["properties"] as? ConnectionProperties
+    static func get() -> Context {
+        var properties = Thread.current.threadDictionary["properties"] as? Context
         if properties == nil {
-            properties = ConnectionProperties()
+            properties = Context()
             Thread.current.threadDictionary["properties"] = properties
         }
         return properties!
     }
 
-    static func kill() {
+    static func dispose() {
         Thread.current.threadDictionary["properties"] = nil
     }
 

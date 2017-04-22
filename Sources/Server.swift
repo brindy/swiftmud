@@ -38,13 +38,13 @@ class Server {
 
                 let connection = Connection(client: client, world: self.world)
 
-                ConnectionProperties.instance().connection = connection
+                Context.get().connection = connection
 
                 self.connections.insert(connection)
                 connection.start()
                 self.connections.remove(connection)
 
-                ConnectionProperties.kill()
+                Context.dispose()
 
                 log(tag: self, message: "background thread finished for \(String(describing: client.address))")
                 try? client.close()
