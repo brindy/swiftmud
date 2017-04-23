@@ -11,15 +11,16 @@ class DungeonHandler: CommandHandler {
 
     func handle(io: TerminalIO, world: World) -> CommandHandler? {
         log(tag: self, message: "handle IN, commands: \(DungeonHandler.commands)")
+
+        let user = Context.get().user!
         
         guard io.print("Welcome to SwiftMud. \n") else {
             log(tag: self, message: "failed to write welcome message")
             return nil
         }
 
-        // TODO broadcast to the room
-        // io.broadcast(to: world.entryRoom().users, "\(user.name) has materialised.")
-        // worldEntryRoom().add(user: user)
+        io.broadcast(to: Array(world.entryRoom.users), "\(user.name) has materialised.")
+        world.entryRoom.users.insert(user)
 
         guard LookHandler().execute(args: "", with: io, in: world) else {
             log(tag: self, message: "initial LookHandler failed")

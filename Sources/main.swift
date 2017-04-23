@@ -14,7 +14,7 @@ Server(port: serverPort).start()
 func log(tag: Any, message: String) {
     var tag = tag is String ? tag : Mirror(reflecting: tag).subjectType
     if let connection = Context.get().connection {
-        tag = "\(connection.client.address)] [\(tag)]"
+        tag = "\(connection)] [\(tag)]"
     }
     print("[\(Date())] [\(serverPort)] [\(tag)]", message)
 }

@@ -3,23 +3,35 @@ import Transport
 
 protocol TerminalIO {
 
-    var user:User? { get set }
-
     func readLine() -> String?
     
     func print(_ string: String) -> Bool
-    
+
+    func broadcast(to: [User], _ string: String)
 }
 
-class Connection: TerminalIO {
+class Connection: TerminalIO, Hashable, Equatable {
 
-    var commandHandler: CommandHandler! = LoginHandler()
+    var user: User? {
+        get {
+            return context.user
+        }
+    }
 
-    let client: TCPInternetSocket
-    let world: World
-    var user: User?
+    var description: String {
+        get {
+            return String(describing: client.address)
+        }
+    }
 
-    init(client: TCPInternetSocket, world: World) {
+    private var commandHandler: CommandHandler! = LoginHandler()
+    private weak var context:Context! = Context.get()
+    private weak var server: Server?
+    private let client: TCPInternetSocket
+    private let world: World
+
+    init(server: Server, client: TCPInternetSocket, world: World) {
+        self.server = server
         self.client = client
         self.world = world
     }
@@ -62,20 +74,40 @@ class Connection: TerminalIO {
         }
         
         return true
-        
     }
 
-}
+    func broadcast(to users: [User], _ string: String) {
+        log(tag: self, message: "broadcasting to users \(users)")
 
+        for connection in server!.connections {
+            log(tag: self, message: "broadcasting to \(connection)")
 
-extension Connection: Hashable, Equatable {
-    
+            guard let connectedUser = connection.user else {
+                log(tag: self, message: "\(connection) has no user")
+                continue
+            }
+
+            guard users.contains(where: { $0.name == connectedUser.name}) else {
+                log(tag: self, message: "\(connectedUser) is not in broadcast list")
+                continue
+            }
+
+            let _ = connection.print("\(string)\n> ")
+        }
+
+    }
+
     public var hashValue: Int {
-        return String(describing: client).hashValue
+        return String(describing: client.address).hashValue
     }
-    
+
     public static func ==(lhs: Connection, rhs: Connection) -> Bool {
-        return String(describing: lhs.client) == String(describing: rhs.client)
+        return String(describing: lhs.client.address) == String(describing: rhs.client.address)
     }
-    
+
+    deinit {
+        // TODO remove this user from any rooms they're in
+        log(tag: self, message: "deinit")
+    }
+
 }

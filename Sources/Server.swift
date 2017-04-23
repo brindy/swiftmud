@@ -36,11 +36,13 @@ class Server {
             background {
                 log(tag: self, message: "new background thread for \(String(describing: client.address))")
 
-                let connection = Connection(client: client, world: self.world)
+                let connection = Connection(server: self, client: client, world: self.world)
 
                 Context.get().connection = connection
 
                 self.connections.insert(connection)
+                log(tag: self, message: "we now have \(self.connections.count) connections")
+
                 connection.start()
                 self.connections.remove(connection)
 

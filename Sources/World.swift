@@ -6,9 +6,23 @@ struct User {
     
 }
 
+extension User: Hashable, Equatable {
+
+    public var hashValue: Int {
+        return name.hashValue
+    }
+
+    public static func ==(lhs: User, rhs: User) -> Bool {
+        return lhs.name == rhs.name
+    }
+
+}
+
 
 class World {
-    
+
+    let entryRoom = Room()
+
     var users: [String: User] = [:]
     
     func findUser(with name: String) -> User? {
@@ -20,6 +34,11 @@ class World {
         log(tag: "World", message: "updating user \(user)")
         users[user.name] = user
     }
-    
+
 }
 
+class Room {
+
+    var users:Set<User> = []
+
+}
