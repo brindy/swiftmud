@@ -19,8 +19,8 @@ class DungeonHandler: CommandHandler {
             return nil
         }
 
-        io.broadcast(to: Array(world.entryRoom.users), "\(user.name) has materialised.")
-        world.entryRoom.users.insert(user)
+        io.broadcast(to: Array(world.users(in: world.entryRoom)), "\(user.name) has materialised.")
+        world.add(user: user)
 
         guard LookHandler().execute(args: "", with: io, in: world) else {
             log(tag: self, message: "initial LookHandler failed")
@@ -85,11 +85,30 @@ class LookHandler: DungeonCommandHandler {
 
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
 
-        // TODO what room is the current user in?
-        // let room = world.room(for: user)
+        let room = world.room(for: Context.get().user!)!
 
-        guard io.print("You are in a room.\n") else {
+        guard io.print("You are in \(room)\n") else {
             return false
+        }
+
+        if room.exits.count > 0 {
+
+            guard io.print("\nExits:\n") else {
+                return false
+            }
+
+            for exit in room.exits.keys {
+
+                let room = room.exits[exit]!
+                guard io.print("\(exit) : \(room.title)\n") else {
+                    return false
+                }
+
+            }
+
+            guard io.print("\n") else {
+                return false
+            }
         }
 
         return true

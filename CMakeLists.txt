@@ -11,6 +11,8 @@ set(SOURCE_FILES
         Sources/main.swift
         Sources/Server.swift
         Sources/DungeonHandler.swift
+        Sources/User.swift
+        Sources/Room.swift
         Sources/World.swift)
 
 add_custom_target(SwiftMud
