@@ -7,6 +7,7 @@ set(SOURCE_FILES
         Sources/Context.swift
         Sources/CommandHandler.swift
         Sources/Connection.swift
+        Sources/DungeonCommandHandler.swift
         Sources/LoginHandler.swift
         Sources/main.swift
         Sources/Server.swift

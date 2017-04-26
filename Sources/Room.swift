@@ -53,6 +53,10 @@ class GenericRoom: BaseRoom {
         return title
     }
 
+    override func titleInRoom() -> String {
+        return title
+    }
+
     override func onEntry(world: World, from: Room) {
 
         guard let user = Context.get().user else {
@@ -85,7 +89,7 @@ class DeathRoom: BaseRoom {
     override func onEntry(world: World, from: Room) {
 
         if let connection = Context.get().connection {
-            let _  = connection.print("You have died.\n\n")
+            let _  = connection.print("You are dead.\n\n")
             connection.disconnect()
         }
 

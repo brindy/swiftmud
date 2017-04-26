@@ -46,6 +46,10 @@ class Server {
                 connection.start()
                 self.connections.remove(connection)
 
+                if let user = Context.get().user {
+                    // TODO broadcast disconnection
+                }
+
                 Context.dispose()
 
                 log(tag: self, message: "background thread finished for \(String(describing: client.address))")

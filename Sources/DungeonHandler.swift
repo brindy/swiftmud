@@ -1,30 +1,23 @@
 
+typealias DungeonCommandHandlerFactory = () -> DungeonCommandHandler
+
 class DungeonHandler: CommandHandler {
 
-    // TODO synonyms
+    static let commands: [String: DungeonCommandHandlerFactory] = [
 
-    static let commands: [String: DungeonCommandHandler] = [
-        "quit" : QuitHandler(),
-        "help" : HelpHandler(),
-        "look" : LookHandler(),
-        "go"   : GoHandler(),
+        "quit"  : { QuitHandler() },
+        "help"  : { HelpHandler() },
+        "look"  : { LookHandler() },
+        "go"    : { GoHandler() },
+
     ]
 
     func handle(io: TerminalIO, world: World) -> CommandHandler? {
         log(tag: self, message: "handle IN, commands: \(DungeonHandler.commands)")
 
         let user = Context.get().user!
-        
-        guard io.print("Welcome to SwiftMud. \n") else {
-            log(tag: self, message: "failed to write welcome message")
-            return nil
-        }
 
-        io.broadcast(to: Array(world.users(in: world.entryRoom)), "\(user.name) has materialised.")
-        world.add(user: user)
-
-        guard LookHandler().execute(args: "", with: io, in: world) else {
-            log(tag: self, message: "initial LookHandler failed")
+        guard beginSession(io, world, user) else {
             return nil
         }
 
@@ -42,7 +35,16 @@ class DungeonHandler: CommandHandler {
 
             let command = line.components(separatedBy: " ")[0]
             log(tag: self, message: "command: \(command)")
-            guard let handler = DungeonHandler.commands[command] else {
+
+            var handler = DungeonHandler.commands[command]
+
+            if handler == nil { // unknown command, check to see if the current room has a matching direction
+                handler = roomExitHandler(command, user, world)
+            }
+
+            // TODO (future) objects in the room might have handlers
+
+            if handler == nil { // still no command, report to the user and wait for further input
 
                 if line == "" {
                     continue
@@ -56,139 +58,48 @@ class DungeonHandler: CommandHandler {
                 continue
             }
 
-            let args = line.substring(from: line.index(line.startIndex, offsetBy: command.utf8.count)).trimmingCharacters(in: .whitespacesAndNewlines)
-            log(tag: self, message: "args: \(args)")
-
-            guard handler.execute(args: args, with: io, in: world) else {
-                log(tag: self, message: "handler has failed \(handler)")
+            guard processCommand(line, command, world, io, handler!) else {
                 return nil
             }
         }
         
-//        log(tag: self, message: "handle OUT")
-//        return self
+    }
+
+    private func beginSession(_ io: TerminalIO, _ world: World, _ user: User) -> Bool {
+        guard io.print("Welcome to SwiftMud. \n") else {
+            log(tag: self, message: "failed to write welcome message")
+            return false
+        }
+
+        io.broadcast(to: Array(world.users(in: world.entryRoom)), "\(user.name) has materialised.")
+        world.add(user: user)
+
+        guard LookHandler().execute(args: "", with: io, in: world) else {
+            log(tag: self, message: "initial LookHandler failed")
+            return false
+        }
+
+        return true
+    }
+
+    private func processCommand(_ line: String, _ command: String, _ world: World, _ io: TerminalIO, _ handler: DungeonCommandHandlerFactory) -> Bool {
+        let args = line.substring(from: line.index(line.startIndex, offsetBy: command.utf8.count)).trimmingCharacters(in: .whitespacesAndNewlines)
+        log(tag: self, message: "args: \(args)")
+
+        guard handler().execute(args: args, with: io, in: world) else {
+            log(tag: self, message: "handler has failed")
+            return false
+        }
+
+        return true
+    }
+
+    private func roomExitHandler(_ command: String, _ user: User, _ world: World) -> DungeonCommandHandlerFactory? {
+        if world.room(for: user)?.exits[command] != nil {
+            return { GoHandler(direction: command) }
+        }
+        return nil
     }
     
 }
 
-protocol DungeonCommandHandler: CustomStringConvertible {
-
-    /// return false to disconnect this client
-    func execute(args: String, with io: TerminalIO, in world: World) -> Bool
-
-}
-
-class LookHandler: DungeonCommandHandler {
-
-    var description: String {
-        return "shows information about the current room"
-    }
-
-    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
-
-        let room = world.room(for: Context.get().user!)!
-
-        guard io.print("You are in \(room)\n") else {
-            return false
-        }
-
-        guard showExits(for: room, with: io) else {
-            return false
-        }
-
-        // TODO show other players here
-
-        return true
-    }
-
-    private func showExits(for room: Room, with io: TerminalIO) -> Bool {
-        guard room.exits.count > 0 else {
-            return true
-        }
-
-        guard io.print("\nExits:\n") else {
-            return false
-        }
-
-        for exit in room.exits.keys {
-
-            let room = room.exits[exit]!
-            guard io.print("\(exit) : \(room.titleAsExit(to: exit))\n") else {
-                return false
-            }
-
-        }
-
-        guard io.print("\n") else {
-            return false
-        }
-
-        return true
-    }
-
-}
-
-class QuitHandler: DungeonCommandHandler {
-
-    var description: String {
-        return "[message] - exit SwiftMud with optional message"
-    }
-
-    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
-        let _ = io.print("Thanks for playing. Please come back soon!\n\n")
-        log(tag: self, message: "User has quit with args: [\(args)]")
-        return false
-    }
-
-}
-
-class HelpHandler: DungeonCommandHandler {
-
-    var description: String {
-        return "shows this command"
-    }
-
-    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
-        log(tag: self, message: "help")
-
-        for commandName in DungeonHandler.commands.keys.sorted() {
-            let command = DungeonHandler.commands[commandName]!
-            guard io.print("\(commandName) : \(command)\n") else {
-                return false
-            }
-        }
-
-        return true
-    }
-
-}
-
-class GoHandler: DungeonCommandHandler {
-
-    var description: String {
-        return "<direction> - head in specified direction"
-    }
-
-    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
-        log(tag: self, message: "go \(args)")
-
-        guard let user = Context.get().user else {
-            return false
-        }
-
-        guard let room = world.room(for: user) else {
-            return false
-        }
-
-        guard let destination = room.exits[args] else {
-            guard io.print("I can't head \(args).\n") else {
-                return false
-            }
-            return true
-        }
-
-        world.move(user: user, to: destination)
-        return true
-    }
-
-}
