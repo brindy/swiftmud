@@ -3,15 +3,14 @@ import Foundation
 
 class World {
 
-    let entryRoom = Room(title: "The Foyer")
+    let entryRoom = GenericRoom(title: "The Foyer")
 
     private var users: [String: User] = [:]
 
     private var userRooms: [User: Room] = [:]
 
     init() {
-        let deathRoom = Room(title: "Death Room")
-        entryRoom.exits["north"] = deathRoom
+        entryRoom.exits["north"] = DeathRoom()
     }
 
     func add(user: User) {
@@ -33,12 +32,19 @@ class World {
         return userRooms[user]
     }
 
+    func move(user: User, to room: Room) {
+        let existingRoom = userRooms[user]!
+        existingRoom.onExit(world: self, to: room)
+        userRooms[user] = room
+        room.onEntry(world: self, from: existingRoom)
+    }
+
     func users(in room: Room) -> [User] {
         var users = [User]()
 
         for user in userRooms.keys {
 
-            guard room == userRooms[user]! else {
+            guard room === userRooms[user]! else {
                 continue
             }
 

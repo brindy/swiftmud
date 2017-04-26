@@ -7,6 +7,7 @@ class DungeonHandler: CommandHandler {
         "quit" : QuitHandler(),
         "help" : HelpHandler(),
         "look" : LookHandler(),
+        "go"   : GoHandler(),
     ]
 
     func handle(io: TerminalIO, world: World) -> CommandHandler? {
@@ -91,24 +92,35 @@ class LookHandler: DungeonCommandHandler {
             return false
         }
 
-        if room.exits.count > 0 {
+        guard showExits(for: room, with: io) else {
+            return false
+        }
 
-            guard io.print("\nExits:\n") else {
+        // TODO show other players here
+
+        return true
+    }
+
+    private func showExits(for room: Room, with io: TerminalIO) -> Bool {
+        guard room.exits.count > 0 else {
+            return true
+        }
+
+        guard io.print("\nExits:\n") else {
+            return false
+        }
+
+        for exit in room.exits.keys {
+
+            let room = room.exits[exit]!
+            guard io.print("\(exit) : \(room.titleAsExit(to: exit))\n") else {
                 return false
             }
 
-            for exit in room.exits.keys {
+        }
 
-                let room = room.exits[exit]!
-                guard io.print("\(exit) : \(room.title)\n") else {
-                    return false
-                }
-
-            }
-
-            guard io.print("\n") else {
-                return false
-            }
+        guard io.print("\n") else {
+            return false
         }
 
         return true
@@ -123,6 +135,7 @@ class QuitHandler: DungeonCommandHandler {
     }
 
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
+        let _ = io.print("Thanks for playing. Please come back soon!\n\n")
         log(tag: self, message: "User has quit with args: [\(args)]")
         return false
     }
@@ -145,6 +158,36 @@ class HelpHandler: DungeonCommandHandler {
             }
         }
 
+        return true
+    }
+
+}
+
+class GoHandler: DungeonCommandHandler {
+
+    var description: String {
+        return "<direction> - head in specified direction"
+    }
+
+    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
+        log(tag: self, message: "go \(args)")
+
+        guard let user = Context.get().user else {
+            return false
+        }
+
+        guard let room = world.room(for: user) else {
+            return false
+        }
+
+        guard let destination = room.exits[args] else {
+            guard io.print("I can't head \(args).\n") else {
+                return false
+            }
+            return true
+        }
+
+        world.move(user: user, to: destination)
         return true
     }
 

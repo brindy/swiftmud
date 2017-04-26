@@ -97,6 +97,10 @@ class Connection: TerminalIO, Hashable, Equatable {
 
     }
 
+    func disconnect() {
+        try? client.close()
+    }
+
     public var hashValue: Int {
         return String(describing: client.address).hashValue
     }
