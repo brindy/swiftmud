@@ -3,14 +3,18 @@ import Foundation
 
 class World {
 
-    let entryRoom = GenericRoom(title: "The Foyer")
+    let entryRoom: Room // = GenericRoom(title: "The Foyer")
 
     private var users: [String: User] = [:]
 
     private var userRooms: [User: Room] = [:]
 
     init() {
-        entryRoom.exits["north"] = DeathRoom()
+        guard let entryRoom = RoomFactory.loadRooms(from: "map.json", withFirstRoom: "entry") else {
+            fatalError("failed to load rooms")
+        }
+
+        self.entryRoom = entryRoom
     }
 
     func add(user: User) {

@@ -115,7 +115,7 @@ class LoginHandler: CommandHandler {
         
         while (true) {
         
-            guard io.print("Hello, please enter your name: ") else {
+            guard io.format().red().bold().print("Hello, please enter your name: ") else {
                 log(tag: self, message: "failed to write prompt")
                 return nil
             }

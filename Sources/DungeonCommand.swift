@@ -1,12 +1,12 @@
 
-protocol DungeonCommandHandler: CustomStringConvertible {
+protocol DungeonCommand: CustomStringConvertible {
 
     /// return false to disconnect this client
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool
 
 }
 
-class LookHandler: DungeonCommandHandler {
+class LookCommand: DungeonCommand {
 
     var description: String {
         return "shows information about the current room"
@@ -14,9 +14,17 @@ class LookHandler: DungeonCommandHandler {
 
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
 
-        let room = world.room(for: Context.get().user!)!
+        guard let user = Context.get().user else {
+            log(tag: self, message: "no user")
+            return false
+        }
 
-        guard io.print("You are in \(room.titleInRoom())\n") else {
+        guard let room = world.room(for: user) else {
+            log(tag: self, message: "user \(user.name) is not a room")
+            return false
+        }
+
+        guard io.print("\(room.titleInRoom())\n") else {
             return false
         }
 
@@ -24,7 +32,35 @@ class LookHandler: DungeonCommandHandler {
             return false
         }
 
-        // TODO show other players here
+        guard showUsers(for: room, with: io, in: world) else {
+            return false
+        }
+
+        return true
+    }
+
+    private func showUsers(for room: Room, with io: TerminalIO, in world: World) -> Bool {
+        guard let user = Context.get().user else {
+            log(tag: self, message: "no user")
+            return false
+        }
+
+        var users = Set(world.users(in: room))
+        users.remove(user)
+
+        guard users.count > 0 else {
+            return true
+        }
+
+        for user in users {
+            guard io.print("👤 \(user.name) is here.\n") else {
+                return false
+            }
+        }
+
+        guard io.print("\n") else {
+            return false
+        }
 
         return true
     }
@@ -39,12 +75,9 @@ class LookHandler: DungeonCommandHandler {
         }
 
         for exit in room.exits.keys {
-
-            let room = room.exits[exit]!
             guard io.print("\(exit) : \(room.titleAsExit(to: exit))\n") else {
                 return false
             }
-
         }
 
         guard io.print("\n") else {
@@ -56,7 +89,7 @@ class LookHandler: DungeonCommandHandler {
 
 }
 
-class QuitHandler: DungeonCommandHandler {
+class QuitCommand: DungeonCommand {
 
     var description: String {
         return "[message] - exit SwiftMud with optional message"
@@ -70,7 +103,7 @@ class QuitHandler: DungeonCommandHandler {
 
 }
 
-class HelpHandler: DungeonCommandHandler {
+class HelpCommand: DungeonCommand {
 
     var description: String {
         return "shows this command"
@@ -83,7 +116,7 @@ class HelpHandler: DungeonCommandHandler {
             let command = DungeonHandler.commands[commandName]!
 
             // TODO have a help item on the command
-            guard io.print("\(commandName) : \(command)\n") else {
+            guard io.print("\(commandName) : \(command().description)\n") else {
                 return false
             }
         }
@@ -93,7 +126,7 @@ class HelpHandler: DungeonCommandHandler {
 
 }
 
-class GoHandler: DungeonCommandHandler {
+class GoCommand: DungeonCommand {
 
     let direction: String?
 
@@ -127,12 +160,12 @@ class GoHandler: DungeonCommandHandler {
             return true
         }
 
-        guard io.print("You head \(direction ?? args).\n\n") else {
+        guard io.print("You head towards \(direction ?? args).\n\n") else {
             return false
         }
 
         world.move(user: user, to: destination)
-        return true
+        return LookCommand().execute(args: "", with: io, in: world)
     }
 
 }

@@ -1,14 +1,14 @@
 
-typealias DungeonCommandHandlerFactory = () -> DungeonCommandHandler
+typealias DungeonCommandHandlerFactory = () -> DungeonCommand
 
 class DungeonHandler: CommandHandler {
 
     static let commands: [String: DungeonCommandHandlerFactory] = [
 
-        "quit"  : { QuitHandler() },
-        "help"  : { HelpHandler() },
-        "look"  : { LookHandler() },
-        "go"    : { GoHandler() },
+        "quit"  : { QuitCommand() },
+        "help"  : { HelpCommand() },
+        "look"  : { LookCommand() },
+        "go"    : { GoCommand() },
 
     ]
 
@@ -71,10 +71,10 @@ class DungeonHandler: CommandHandler {
             return false
         }
 
-        io.broadcast(to: Array(world.users(in: world.entryRoom)), "\(user.name) has materialised.")
+        io.broadcast(to: Array(world.users(in: world.entryRoom)), "👤\(user.name) has materialised.")
         world.add(user: user)
 
-        guard LookHandler().execute(args: "", with: io, in: world) else {
+        guard LookCommand().execute(args: "", with: io, in: world) else {
             log(tag: self, message: "initial LookHandler failed")
             return false
         }
@@ -96,7 +96,7 @@ class DungeonHandler: CommandHandler {
 
     private func roomExitHandler(_ command: String, _ user: User, _ world: World) -> DungeonCommandHandlerFactory? {
         if world.room(for: user)?.exits[command] != nil {
-            return { GoHandler(direction: command) }
+            return { GoCommand(direction: command) }
         }
         return nil
     }

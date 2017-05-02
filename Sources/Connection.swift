@@ -10,6 +10,53 @@ protocol TerminalIO {
     func broadcast(to: [User], _ string: String)
 }
 
+extension TerminalIO {
+
+    func format() -> FormattedIO {
+        return FormattedIO(wrap: self)
+    }
+
+}
+
+class FormattedIO: TerminalIO {
+
+    let io: TerminalIO
+
+    var formats = [String]()
+
+    init(wrap io: TerminalIO) {
+        self.io = io
+    }
+
+    // MARK: FormattedIO
+
+    func red() -> FormattedIO {
+        formats.append("31")
+        return self
+    }
+
+    func bold() -> FormattedIO {
+        formats.append("1")
+        return self
+    }
+
+    // MARK: Terminal IO
+
+    func readLine() -> String? {
+        return io.readLine()
+    }
+
+    func print(_ string: String) -> Bool {
+        let format = formats.joined(separator: ";")
+        return io.print("\u{1b}[\(format)m\(string)\u{1b}[0m")
+    }
+
+    func broadcast(to users: [User], _ string: String) {
+        return io.broadcast(to: users, string)
+    }
+
+}
+
 class Connection: TerminalIO, Hashable, Equatable {
 
     var user: User? {

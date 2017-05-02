@@ -1,0 +1,81 @@
+{
+	"entry": {
+		"title": "The Foyer",
+		"exits": {
+			"west": { "room": "foyer_station", "description": "a railway station with destinations to worlds of adventure" },
+			"north": { "room": "death", "description": "the glittering of what appears to be gold" }
+		}
+	},
+
+	"death": {
+		"class": "DeathRoom"
+	},
+
+	"foyer_station": {
+		"title": "Foyer Station",
+		"exits": {
+			"east": { "room": "entry", "description": "back to the foyer" },
+			"dunwich": { "room": "dunwich_station", "description": "Dunwich - a small subset of Lovecraftian horror" }
+		}
+	},
+
+	"dunwich_station": {
+
+		"title": "Dunwich Station",
+		"exits": {
+			"foyer": { "room": "foyer_station", "description": "The Foyer Station" },
+			"north": { "room": "dunwich_road_1", "description": "A long dusty road" }
+		}
+
+	},
+
+	"dunwich_road_1": {
+
+		"title": "A long dusty road",
+		"exits": {
+			"south": { "room": "dunwich_station", "description": "Dunwitch Station" },
+			"north": { "room": "dunwich_road_2", "description": "A long dusty road" }
+		}
+
+	},
+
+	"dunwich_road_2": {
+
+		"title": "A long dusty road",
+		"exits": {
+			"south": { "room": "dunwich_road_1", "description": "A long dusty road" },
+			"north": { "room": "dunwich_road_3", "description": "A long dusty road" }
+		}
+
+	},
+
+	"dunwich_road_3": {
+
+		"title": "The end of a long dusty road",
+		"exits": {
+			"west": { "room": "fyre_farm_field_1", "description": "A corn field" },
+			"east": { "room": "fyre_farm_gate", "description": "A gate with a sign-post" },
+			"south": { "room": "dunwich_road_2", "description": "A long dusty road" },
+		}
+
+	},
+
+	"fyre_farm_gate": {
+
+		"title": "The gated entrance of Fyre Farm",
+		"exits": {
+			"west": { "room": "dunwich_road_3", "description": "A long dustry road" },
+		}
+
+	},
+
+	"fyre_farm_field_1": {
+
+		"title": "A corn field",
+		"exits": {
+			"east": { "room": "fyre_farm_gate", "description": "A long dustry road" },
+		}
+
+	}
+
+}
