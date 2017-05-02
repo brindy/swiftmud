@@ -3,18 +3,24 @@ import Foundation
 
 class Room {
 
-    required init() {
-    }
+    var logic: RoomLogic?
 
+    var id: String
+    var roomTitle: String?
     var exits = [String: Room]()
     var exitDescriptions = [String: String]()
 
-    func titleAsExit(to direction: String) -> String {
-        return exitDescriptions[direction]!
+    init(id: String, title: String?) {
+        self.id = id
+        self.roomTitle = title
     }
 
-    func titleInRoom() -> String {
-        fatalError("override required")
+    func title() -> String {
+        return logic?.title() ?? id // roomTitle ?? id
+    }
+
+    func title(seenFrom room: Room) -> String {
+        return logic?.title(seenFrom: room) ?? title()
     }
 
     func onEntry(world: World, from: Room) {
@@ -22,15 +28,14 @@ class Room {
             return
         }
 
-        var users = Set<User>(world.users(in: self))
-        users.remove(user)
-
-        guard let connection = Context.get().connection else {
-            return
+        var incomingDirection = ""
+        if let direction = self.direction(of: from) {
+            incomingDirection = " from the \(direction)"
         }
+        // connection.broadcast(to: Array(users), "")
+        print("👤 \(user.name) has arrived\(incomingDirection)", exceptTo: user)
 
-        // TODO handle direction?
-        connection.broadcast(to: Array(users), "👤 \(user.name) has arrived")
+        logic?.onEntry(world: world, from: from)
     }
 
     func onExit(world: World, to: Room) {
@@ -38,15 +43,43 @@ class Room {
             return
         }
 
-        var users = Set<User>(world.users(in: self))
-        users.remove(user)
+        var outgoingDirection = " has left"
+        if let direction = self.direction(of: to) {
+            outgoingDirection = " heads to the \(direction)"
+        }
+        print("👤 \(user.name)\(outgoingDirection)", exceptTo: user)
 
-        guard let connection = Context.get().connection else {
-            return
+        logic?.onExit(world: world, to: to)
+    }
+
+    func print(_ message: String, exceptTo hiddenTo: User? = nil) {
+
+        let world = Context.get().world
+        let server = Context.get().server
+
+        var users = Set(world!.users(in: self))
+        if let hiddenTo = hiddenTo {
+            users.remove(hiddenTo)
         }
 
-        let theDirection = direction(of: to) ?? "somewhere else"
-        connection.broadcast(to: Array(users), "👤 \(user.name) heads \(theDirection)")
+        log(tag: self, message: "broadcasting to users \(String(describing: users))")
+
+        for connection in server!.connections {
+            log(tag: self, message: "broadcasting to \(connection)")
+
+            guard let connectedUser = connection.user else {
+                log(tag: self, message: "\(connection) has no user")
+                continue
+            }
+
+            guard users.contains(where: { $0.name == connectedUser.name}) else {
+                log(tag: self, message: "\(connectedUser) is not in broadcast list")
+                continue
+            }
+
+            let _ = connection.print("\(message)\n> ")
+        }
+
     }
 
     private func direction(of room: Room) -> String? {
@@ -60,40 +93,48 @@ class Room {
 
 }
 
+protocol RoomLogic {
 
-class GenericRoom: Room {
+    init()
 
-    let title: String
+    func title() -> String?
+    func title(seenFrom room: Room) -> String?
+    func onEntry(world: World, from: Room)
+    func onExit(world: World, to: Room)
 
-    required init() {
-        title = "A generic room"
+}
+
+extension RoomLogic {
+
+    func title() -> String? {
+        return nil
     }
 
-    init(title: String) {
-        self.title = title
+    func title(seenFrom room: Room) -> String? {
+        return nil
     }
 
-    override func titleInRoom() -> String {
-        return title
+    func onEntry(world: World, from: Room) {
+    }
+
+    func onExit(world: World, to: Room) {
     }
 
 }
 
+class DeathRoom: RoomLogic {
 
-class DeathRoom: Room {
-
-    override func titleInRoom() -> String {
-        return "All that glitters, is not gold"
+    required init() {
     }
 
-    override func onEntry(world: World, from: Room) {
+    func onEntry(world: World, from: Room) {
 
         if let connection = Context.get().connection {
-            let _  = connection.print("You are dead.\n\n")
+            let _  = connection.format().red().print("All that glitters is not gold!.\n\n")
+            let _  = connection.format().red().bold().print("You are dead.\n\n")
             connection.disconnect()
         }
 
     }
 
 }
-

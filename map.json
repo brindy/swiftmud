@@ -1,79 +1,83 @@
 {
-	"entry": {
-		"title": "The Foyer",
-		"exits": {
-			"west": { "destination": "foyer_station", "description": "a railway station with destinations to worlds of adventure" },
-			"north": { "destination": "death", "description": "the glittering of what appears to be gold" }
-		}
-	},
+	
+	"rooms": {
+		"entry": {
+			"title": "The Foyer",
+			"exits": {
+				"west": { "destination": "foyer_station", "description": "a railway station with destinations to worlds of adventure" },
+				"north": { "destination": "death", "description": "the glimmering of what appears to be gold" }
+			}
+		},
 
-	"death": {
-		"class": "DeathRoom"
-	},
+		"death": {
+			"class": "DeathRoom"
+		},
 
-	"foyer_station": {
-		"title": "Foyer Station",
-		"exits": {
-			"east": { "destination": "entry", "description": "back to the foyer" },
-			"dunwich": { "destination": "dunwich_station", "description": "Dunwich - a small subset of Lovecraftian horror" }
-		}
-	},
+		"foyer_station": {
+			"title": "Foyer Station",
+			"exits": {
+				"east": { "destination": "entry", "description": "back to the foyer" },
+				"dunwich": { "destination": "dunwich_station", "description": "Dunwich - a small subset of Lovecraftian horror" }
+			}
+		},
 
-	"dunwich_station": {
+		"dunwich_station": {
 
-		"title": "Dunwich Station",
-		"exits": {
-			"foyer": { "destination": "foyer_station", "description": "The Foyer Station" },
-			"north": { "destination": "dunwich_road_1", "description": "A long dusty road" }
-		}
+			"title": "Dunwich Station",
+			"exits": {
+				"foyer": { "destination": "foyer_station", "description": "The Foyer Station" },
+				"north": { "destination": "dunwich_road_1", "description": "A long dusty road" }
+			}
 
-	},
+		},
 
-	"dunwich_road_1": {
+		"dunwich_road_1": {
 
-		"title": "A long dusty road",
-		"exits": {
-			"south": { "destination": "dunwich_station", "description": "Dunwitch Station" },
-			"north": { "destination": "dunwich_road_2", "description": "A long dusty road" }
-		}
+			"title": "A long dusty road",
+			"exits": {
+				"south": { "destination": "dunwich_station", "description": "Dunwitch Station" },
+				"north": { "destination": "dunwich_road_2", "description": "A long dusty road" }
+			}
 
-	},
+		},
 
-	"dunwich_road_2": {
+		"dunwich_road_2": {
 
-		"title": "A long dusty road",
-		"exits": {
-			"south": { "destination": "dunwich_road_1", "description": "A long dusty road" },
-			"north": { "destination": "dunwich_road_3", "description": "A long dusty road" }
-		}
+			"title": "A long dusty road",
+			"exits": {
+				"south": { "destination": "dunwich_road_1", "description": "A long dusty road" },
+				"north": { "destination": "dunwich_road_3", "description": "A long dusty road" }
+			}
 
-	},
+		},
 
-	"dunwich_road_3": {
+		"dunwich_road_3": {
 
-		"title": "The end of a long dusty road",
-		"exits": {
-			"west": { "destination": "fyre_farm_field_1", "description": "A corn field" },
-			"east": { "destination": "fyre_farm_gate", "description": "A gate with a sign-post" },
-			"south": { "destination": "dunwich_road_2", "description": "A long dusty road" },
-		}
+			"title": "The end of a long dusty road",
+			"exits": {
+				"west": { "destination": "fyre_farm_field_1", "description": "A corn field" },
+				"east": { "destination": "fyre_farm_gate", "description": "A gate with a sign-post" },
+				"south": { "destination": "dunwich_road_2", "description": "A long dusty road" },
+			}
 
-	},
+		},
 
-	"fyre_farm_gate": {
+		"fyre_farm_gate": {
 
-		"title": "The gated entrance of Fyre Farm",
-		"exits": {
-			"west": { "destination": "dunwich_road_3", "description": "A long dustry road" },
-		}
+			"title": "The gated entrance of Fyre Farm",
+			"exits": {
+				"west": { "destination": "dunwich_road_3", "description": "A long dustry road" },
+			}
 
-	},
+		},
 
-	"fyre_farm_field_1": {
+		"fyre_farm_field_1": {
 
-		"title": "A corn field",
-		"exits": {
-			"east": { "destination": "fyre_farm_gate", "description": "A long dustry road" },
+			"title": "A corn field",
+			"exits": {
+				"east": { "destination": "fyre_farm_gate", "description": "A long dustry road" },
+			}
+
 		}
 
 	}

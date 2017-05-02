@@ -61,6 +61,8 @@ class Server {
     private func handleConnection(_ client: TCPInternetSocket) {
         let connection = Connection(server: self, client: client, world: self.world)
 
+        Context.get().server = self
+        Context.get().world = world
         Context.get().connection = connection
 
         self.connections.insert(connection)
@@ -71,8 +73,11 @@ class Server {
         self.connections.remove(connection)
 
         if let user = Context.get().user {
-            // TODO remove user from world (not delete)
-            // TODO broadcast disconnection
+            world.remove(user: user)
+
+            if let room = world.room(for: user) {
+                room.print("\(user.name) has disconnected")
+            }
         }
 
         Context.dispose()

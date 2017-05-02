@@ -71,7 +71,7 @@ class DungeonHandler: CommandHandler {
             return false
         }
 
-        io.broadcast(to: Array(world.users(in: world.entryRoom)), "👤\(user.name) has materialised.")
+        world.entryRoom.print("👤\(user.name) has materialised.")
         world.add(user: user)
 
         guard LookCommand().execute(args: "", with: io, in: world) else {

@@ -7,7 +7,6 @@ protocol TerminalIO {
     
     func print(_ string: String) -> Bool
 
-    func broadcast(to: [User], _ string: String)
 }
 
 extension TerminalIO {
@@ -49,10 +48,6 @@ class FormattedIO: TerminalIO {
     func print(_ string: String) -> Bool {
         let format = formats.joined(separator: ";")
         return io.print("\u{1b}[\(format)m\(string)\u{1b}[0m")
-    }
-
-    func broadcast(to users: [User], _ string: String) {
-        return io.broadcast(to: users, string)
     }
 
 }
@@ -123,27 +118,6 @@ class Connection: TerminalIO, Hashable, Equatable {
         return true
     }
 
-    func broadcast(to users: [User], _ string: String) {
-        log(tag: self, message: "broadcasting to users \(users)")
-
-        for connection in server!.connections {
-            log(tag: self, message: "broadcasting to \(connection)")
-
-            guard let connectedUser = connection.user else {
-                log(tag: self, message: "\(connection) has no user")
-                continue
-            }
-
-            guard users.contains(where: { $0.name == connectedUser.name}) else {
-                log(tag: self, message: "\(connectedUser) is not in broadcast list")
-                continue
-            }
-
-            let _ = connection.print("\(string)\n> ")
-        }
-
-    }
-
     func disconnect() {
         try? client.close()
     }
@@ -157,8 +131,10 @@ class Connection: TerminalIO, Hashable, Equatable {
     }
 
     deinit {
-        // TODO remove this user from any rooms they're in
         log(tag: self, message: "deinit")
+        if let user = Context.get().user {
+            world.remove(user: user)
+        }
     }
 
 }

@@ -24,7 +24,7 @@ class LookCommand: DungeonCommand {
             return false
         }
 
-        guard io.print("\(room.titleInRoom())\n") else {
+        guard io.print("\(room.title())\n") else {
             return false
         }
 
@@ -74,8 +74,8 @@ class LookCommand: DungeonCommand {
             return false
         }
 
-        for exit in room.exits.keys {
-            guard io.print("\(exit) : \(room.titleAsExit(to: exit))\n") else {
+        for exit in room.exits {
+            guard io.print("\(exit.key) : \(exit.value.title(seenFrom: room))\n") else {
                 return false
             }
         }
@@ -115,7 +115,6 @@ class HelpCommand: DungeonCommand {
         for commandName in DungeonHandler.commands.keys.sorted() {
             let command = DungeonHandler.commands[commandName]!
 
-            // TODO have a help item on the command
             guard io.print("\(commandName) : \(command().description)\n") else {
                 return false
             }

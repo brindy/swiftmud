@@ -15,7 +15,9 @@ class Context {
         Thread.current.threadDictionary["properties"] = nil
     }
 
-    var connection: Connection?
+    weak var world: World?
+    weak var server: Server?
+    weak var connection: Connection?
     var user: User?
 
     deinit {
