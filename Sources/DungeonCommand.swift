@@ -129,12 +129,17 @@ class HelpCommand: DungeonCommand {
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
         log(tag: self, message: "help")
 
-        for commandName in DungeonHandler.commands.keys.sorted() {
-            let command = DungeonHandler.commands[commandName]!
+        for command in DungeonHandler.commands {
 
-            guard io.print("\(commandName) : \(command().description)\n") else {
+            let keywords = command.keywords.joined(separator: ", ")
+
+            guard io.print("\(keywords) : \(command.factory().description)\n") else {
                 return false
             }
+        }
+
+        guard io.print("\n") else {
+            return false
         }
 
         return true

@@ -20,7 +20,13 @@ class Room {
     }
 
     func title(seenFrom room: Room) -> String {
-        return logic?.title(seenFrom: room) ?? title()
+
+        var exitTitle: String?
+        if let direction = room.direction(of: self) {
+            exitTitle = room.exitDescriptions[direction]
+        }
+
+        return logic?.title(seenFrom: room) ?? exitTitle ?? title()
     }
 
     func onEntry(world: World, from: Room) {
@@ -125,10 +131,6 @@ extension RoomLogic {
 class DeathRoom: RoomLogic {
 
     required init() {
-    }
-
-    func title(seenFrom room: Room) -> String? {
-        return "a golden glimmer"
     }
 
     func onEntry(world: World, from: Room) {
