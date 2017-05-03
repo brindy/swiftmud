@@ -16,7 +16,7 @@ class Room {
     }
 
     func title() -> String {
-        return logic?.title() ?? id // roomTitle ?? id
+        return logic?.title() ?? roomTitle ?? id
     }
 
     func title(seenFrom room: Room) -> String {
@@ -125,6 +125,10 @@ extension RoomLogic {
 class DeathRoom: RoomLogic {
 
     required init() {
+    }
+
+    func title(seenFrom room: Room) -> String? {
+        return "a golden glimmer"
     }
 
     func onEntry(world: World, from: Room) {

@@ -4,12 +4,12 @@ typealias DungeonCommandHandlerFactory = () -> DungeonCommand
 class DungeonHandler: CommandHandler {
 
     static let commands: [String: DungeonCommandHandlerFactory] = [
-
         "quit"  : { QuitCommand() },
         "help"  : { HelpCommand() },
         "look"  : { LookCommand() },
         "go"    : { GoCommand() },
-
+        "say"   : { SpeakCommand() },
+        "'"     : { SpeakCommand() }
     ]
 
     func handle(io: TerminalIO, world: World) -> CommandHandler? {

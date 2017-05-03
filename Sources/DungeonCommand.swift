@@ -6,6 +6,29 @@ protocol DungeonCommand: CustomStringConvertible {
 
 }
 
+extension DungeonCommand {
+
+    func currentRoom() -> Room? {
+        guard let world = Context.get().world else {
+            log(tag: self, message: "no world")
+            return nil
+        }
+
+        guard let user = Context.get().user else {
+            log(tag: self, message: "no user")
+            return nil
+        }
+
+        guard let room = world.room(for: user) else {
+            log(tag: self, message: "user \(user.name) is not a room")
+            return nil
+        }
+
+        return room
+    }
+
+}
+
 class LookCommand: DungeonCommand {
 
     var description: String {
@@ -14,13 +37,7 @@ class LookCommand: DungeonCommand {
 
     func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
 
-        guard let user = Context.get().user else {
-            log(tag: self, message: "no user")
-            return false
-        }
-
-        guard let room = world.room(for: user) else {
-            log(tag: self, message: "user \(user.name) is not a room")
+        guard let room = currentRoom() else {
             return false
         }
 
@@ -118,6 +135,35 @@ class HelpCommand: DungeonCommand {
             guard io.print("\(commandName) : \(command().description)\n") else {
                 return false
             }
+        }
+
+        return true
+    }
+
+}
+
+class SpeakCommand: DungeonCommand {
+
+    var description: String {
+        return "say something in your current room"
+    }
+
+    func execute(args: String, with io: TerminalIO, in world: World) -> Bool {
+        log(tag: self, message: "speak")
+
+        guard let room = currentRoom() else {
+            return false
+        }
+
+        guard let user = Context.get().user else {
+            return false
+        }
+
+        let speakType = args.trim().hasSuffix("?") ? "ask" : "say"
+        room.print("👤 \(user.name) 🗣 \(speakType)s '\(args)'", exceptTo: user)
+
+        guard io.print("You \(speakType), '\(args)'\n") else {
+            return false
         }
 
         return true

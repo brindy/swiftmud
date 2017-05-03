@@ -18,3 +18,11 @@ func log(tag: Any, message: String) {
     }
     print("[\(Date())] [\(serverPort)] [\(tag)]", message)
 }
+
+extension String {
+
+    func trim() -> String {
+        return trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+}
